@@ -38,7 +38,7 @@ const handleErrors = (err) => {
 router.post("/",upload.single('uploads'),(req,res)=>{
     try{
         console.log(req.file.filename);
-        const image=req.file.filename;
+        const image=`https://epatrakaar.onrender.com/uploads/${req.file.filename}`;
         console.log(req.body);
     const { author, title,description, content ,category, tags, keywords } =
       req.body;
