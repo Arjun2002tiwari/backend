@@ -1,30 +1,65 @@
-const path = require('path');
-const multer = require('multer')
+const multer=require("multer");
+const path=require("path");
+const express = require("express");
+const router = express.Router();
+const Articles = require("./articleModel");
 
-let storing = multer.diskStorage({
-    destination: function(req,file,cb){
-        cb(null,'./public/uploads/')
+var Image="";
+const storage=multer.diskStorage({
+    destination:'./public/uploads',
+    filename:(req,file,cb)=>{
+        return cb(null,`${Date.now()}${path.extname(file.originalname)}`)
     },
-    filename: function(req,file,cb){
-        let ext = path.extname(file.originalname)
-        cb(null,Date.now()+ext)
-    }
+});
+const upload=multer({
+    storage:storage,
 })
 
-let upload = multer({
-    storage:storing,
-    fileFilter:function(req,file,cb){
-        if(file.mimetype === "image/png" || file.mimetype === "image/jpg"){
-            cb(null,true)
-        } else {
-            console.log("only jpg & png file supported")
-            cb(null,false)
-        }
-    },
-    limits:{
-        fileSize: 1024*1024*2
+const handleErrors = (err) => {
+    let errors = { title: "", description: "", url: "", content: "" };
+  
+    if (err.message.includes("title")) {
+      errors.title = "title already exists";
+      return errors;
     }
-})
-
-module.exports=upload.array("images[]")
-// module.exports = upload;
+    if (err.message.includes("description")) {
+      errors.description = "description already exists";
+      return errors;
+    }
+    if (err.message.includes("url")) {
+      errors.url = "url already exists";
+      return errors;
+    }
+    if (err.message.includes("content")) {
+      errors.content = "content already exists";
+      return errors;
+    }
+  };
+router.post("/",upload.single('uploads'),(req,res)=>{
+    try{
+        console.log(req.file.filename);
+        const image=req.file.filename;
+    const { author, title,description, content ,category, tags, keywords } =
+      req.body;
+    const keyword = keywords.replace(/,/g, " ");
+    const tag = tags.replace(/,/g, " ");
+    const article = new Articles({
+          author: author,
+          title: title,
+          images: image,
+          description: description,
+          content: content,
+          category: category,
+          tags: tag,
+          keywords: keyword,
+    });
+    article.save();
+    res.status(201).json({ created: true });
+    } 
+    catch (err) {
+        const errors = handleErrors(err);
+        console.log(err);
+        res.json({ err, created: false });
+    }   
+});
+module.exports = router;

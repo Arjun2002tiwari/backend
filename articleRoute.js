@@ -1,14 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const Article = require("../models/articleModel");
+const Article = require("./articleModel");
+const { postArticle, getArticle } = require("./articleController");
 
 
-const { postArticle, getArticle } = require("../controllers/articleController");
 
-const upload = require("../middleware/upload");
-
-
-router.post("/postarticle", upload, postArticle);
+//router.post("/postarticle",postArticle);
 
 // router.post("/getarticle",postArticle)
 

@@ -2,7 +2,7 @@ const express = require("express");
 
 const mongoose = require("mongoose");
 var cors = require('cors');
-const articleRoute= require('./routes/articleRoute')
+const articleRoute= require('./articleRoute')
 
 
 require("dotenv").config();
@@ -19,7 +19,8 @@ mongoose
   })
   .catch((err) => console.log(err));
 
-app.use('/uploads', express.static('uploads'))
+app.use('/uploads', express.static('./public/uploads'));
+app.use('/postarticle',require('./upload'));
 
 app.use(express.json());
 
